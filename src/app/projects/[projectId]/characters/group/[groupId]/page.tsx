@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Plus, Users, Trash2 } from 'lucide-react';
+import { Plus, Users } from 'lucide-react';
 import { useProjectStore } from '@/stores/useProjectStore';
 import { useCharacterStore } from '@/stores/useCharacterStore';
 import { useHydration } from '@/hooks/useHydration';
@@ -11,6 +11,7 @@ import { TabBar } from '@/components/layout/TabBar';
 import { Modal } from '@/components/ui/Modal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { AnimatedList } from '@/components/ui/AnimatedList';
+import { CharacterCard } from '@/components/characters/CharacterCard';
 
 export default function CharacterGroupPage() {
   const { projectId, groupId } = useParams<{ projectId: string; groupId: string }>();
@@ -98,35 +99,15 @@ export default function CharacterGroupPage() {
         ) : (
           <AnimatedList>
             {groupChars.map((char) => (
-              <div
+              <CharacterCard
                 key={char.id}
-                className="group relative rounded-lg bg-bg-secondary p-4 transition-all hover:bg-bg-tertiary"
-                style={{ boxShadow: 'var(--shadow-card)' }}
-              >
-                <button
-                  onClick={() => setEditTarget({ id: char.id, name: char.name, description: char.description ?? '' })}
-                  className="w-full text-left"
-                >
-                  <p className="font-semibold text-text-primary">{char.name}</p>
-                  {char.description && (
-                    <p className="text-sm text-text-muted mt-1">{char.description}</p>
-                  )}
-                </button>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1">
-                  <button
-                    onClick={() => setMoveTarget({ id: char.id, name: char.name })}
-                    className="flex h-8 w-8 items-center justify-center rounded-full opacity-0 group-hover:opacity-100 hover:bg-bg-elevated transition-all text-xs text-text-muted"
-                  >
-                    移動
-                  </button>
-                  <button
-                    onClick={() => setDeleteTarget(char.id)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full opacity-0 group-hover:opacity-100 hover:bg-red-600/20 transition-all"
-                  >
-                    <Trash2 size={14} className="text-text-muted hover:text-red-400" />
-                  </button>
-                </div>
-              </div>
+                id={char.id}
+                name={char.name}
+                description={char.description}
+                onEdit={() => setEditTarget({ id: char.id, name: char.name, description: char.description ?? '' })}
+                onDelete={() => setDeleteTarget(char.id)}
+                onMove={() => setMoveTarget({ id: char.id, name: char.name })}
+              />
             ))}
           </AnimatedList>
         )}

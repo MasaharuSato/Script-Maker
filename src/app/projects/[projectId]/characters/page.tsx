@@ -12,6 +12,7 @@ import { TabBar } from '@/components/layout/TabBar';
 import { Modal } from '@/components/ui/Modal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { AnimatedList } from '@/components/ui/AnimatedList';
+import { CharacterCard } from '@/components/characters/CharacterCard';
 
 type CreateMode = 'character' | 'group' | null;
 
@@ -162,46 +163,17 @@ export default function CharactersPage() {
               );
             })}
 
-            {/* Ungrouped characters as individual cards */}
+            {/* Ungrouped characters */}
             {ungrouped.map((char) => (
-              <div
+              <CharacterCard
                 key={char.id}
-                className="group relative rounded-lg bg-bg-secondary p-4 transition-all hover:bg-bg-tertiary"
-                style={{ boxShadow: 'var(--shadow-card)' }}
-              >
-                <button
-                  onClick={() => setEditTarget({ type: 'character', id: char.id, name: char.name, description: char.description })}
-                  className="w-full text-left flex items-center gap-4"
-                >
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-accent-muted">
-                    <Users size={24} className="text-accent" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-text-primary truncate">{char.name}</p>
-                    {char.description ? (
-                      <p className="text-sm text-text-muted mt-0.5 truncate">{char.description}</p>
-                    ) : (
-                      <p className="text-sm text-text-muted mt-0.5">未分類</p>
-                    )}
-                  </div>
-                </button>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  {groups.length > 0 && (
-                    <button
-                      onClick={() => setMoveTarget({ id: char.id, name: char.name })}
-                      className="flex h-8 px-2 items-center justify-center rounded-full hover:bg-bg-elevated transition-colors text-xs text-text-muted"
-                    >
-                      移動
-                    </button>
-                  )}
-                  <button
-                    onClick={() => setDeleteTarget({ type: 'character', id: char.id })}
-                    className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-red-600/20 transition-colors"
-                  >
-                    <Trash2 size={14} className="text-text-muted hover:text-red-400" />
-                  </button>
-                </div>
-              </div>
+                id={char.id}
+                name={char.name}
+                description={char.description}
+                onEdit={() => setEditTarget({ type: 'character', id: char.id, name: char.name, description: char.description })}
+                onDelete={() => setDeleteTarget({ type: 'character', id: char.id })}
+                onMove={groups.length > 0 ? () => setMoveTarget({ id: char.id, name: char.name }) : undefined}
+              />
             ))}
           </AnimatedList>
         )}
