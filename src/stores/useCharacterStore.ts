@@ -9,9 +9,10 @@ interface CharacterState {
   characters: Character[];
   groups: CharacterGroup[];
   // Characters
-  addCharacter: (projectId: string, name: string, groupId?: string | null, description?: string) => Character;
+  addCharacter: (projectId: string, name: string, groupId?: string | null, description?: string, alias?: string) => Character;
   deleteCharacter: (id: string) => void;
   renameCharacter: (id: string, name: string) => void;
+  updateAlias: (id: string, alias: string) => void;
   updateDescription: (id: string, description: string) => void;
   moveCharacter: (id: string, groupId: string | null) => void;
   getCharactersByProject: (projectId: string) => Character[];
@@ -32,10 +33,11 @@ export const useCharacterStore = create<CharacterState>()(
       characters: [],
       groups: [],
 
-      addCharacter: (projectId, name, groupId = null, description = '') => {
+      addCharacter: (projectId, name, groupId = null, description = '', alias = '') => {
         const char: Character = {
           id: nanoid(),
           name,
+          alias,
           description,
           projectId,
           groupId: groupId ?? null,
@@ -49,6 +51,10 @@ export const useCharacterStore = create<CharacterState>()(
       renameCharacter: (id, name) =>
         set((state) => ({
           characters: state.characters.map((c) => (c.id === id ? { ...c, name } : c)),
+        })),
+      updateAlias: (id, alias) =>
+        set((state) => ({
+          characters: state.characters.map((c) => (c.id === id ? { ...c, alias } : c)),
         })),
       updateDescription: (id, description) =>
         set((state) => ({

@@ -68,6 +68,7 @@ export interface CharacterGroup {
 export interface Character {
   id: string;
   name: string;
+  alias: string;
   description: string;
   projectId: string;
   groupId: string | null;

@@ -5,13 +5,14 @@ import { Users, Trash2, ArrowRightLeft } from 'lucide-react';
 interface CharacterCardProps {
   id: string;
   name: string;
+  alias?: string;
   description?: string;
   onEdit: () => void;
   onDelete: () => void;
   onMove?: () => void;
 }
 
-export function CharacterCard({ name, description, onEdit, onDelete, onMove }: CharacterCardProps) {
+export function CharacterCard({ name, alias, description, onEdit, onDelete, onMove }: CharacterCardProps) {
   return (
     <div
       className="relative rounded-lg bg-bg-secondary p-4 transition-all hover:bg-bg-tertiary active:scale-[0.98]"
@@ -27,7 +28,12 @@ export function CharacterCard({ name, description, onEdit, onDelete, onMove }: C
             <Users size={20} className="text-accent" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-text-primary truncate">{name}</p>
+            <div className="flex items-baseline gap-2 min-w-0">
+              <p className="font-semibold text-text-primary truncate">{name}</p>
+              {alias && (
+                <p className="text-xs text-accent shrink-0">({alias})</p>
+              )}
+            </div>
             {description ? (
               <p className="text-sm text-text-muted mt-0.5 truncate">{description}</p>
             ) : (
