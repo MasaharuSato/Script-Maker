@@ -7,6 +7,7 @@ import { useScriptStore } from '@/stores/useScriptStore';
 import { useFolderStore } from '@/stores/useFolderStore';
 import { useHydration } from '@/hooks/useHydration';
 import { AppHeader } from '@/components/layout/AppHeader';
+import { TabBar } from '@/components/layout/TabBar';
 import { ProjectCard } from '@/components/projects/ProjectCard';
 import { ProjectCreateModal } from '@/components/projects/ProjectCreateModal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
@@ -88,6 +89,8 @@ export default function ProjectsPage() {
         title="プロジェクトを削除"
         message="このプロジェクトと中の脚本がすべて削除されます。この操作は取り消せません。"
       />
+
+      <TabBar />
     </div>
   );
 }

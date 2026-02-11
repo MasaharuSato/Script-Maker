@@ -7,6 +7,7 @@ import { useFolderStore } from '@/stores/useFolderStore';
 import { useScriptStore } from '@/stores/useScriptStore';
 import { useHydration } from '@/hooks/useHydration';
 import { AppHeader } from '@/components/layout/AppHeader';
+import { TabBar } from '@/components/layout/TabBar';
 import { ScriptCard } from '@/components/projects/ScriptCard';
 import { Modal } from '@/components/ui/Modal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
@@ -114,6 +115,8 @@ export default function FolderPage() {
         title="脚本を削除"
         message="この脚本を削除しますか？この操作は取り消せません。"
       />
+
+      <TabBar />
     </div>
   );
 }

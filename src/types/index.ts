@@ -56,3 +56,20 @@ export interface Project {
 }
 
 export type ActiveInput = 'scene_heading' | 'dialogue' | 'action' | null;
+
+// メモ帳
+export interface Note {
+  id: string;
+  title: string;
+  content: string;
+  folderId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface NoteFolder {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}
