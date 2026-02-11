@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Plus, Users, Trash2, FolderPlus, UserPlus, ChevronDown, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
+import { Plus, Users, Trash2, FolderPlus, UserPlus, Folder, ChevronRight } from 'lucide-react';
 import { useProjectStore } from '@/stores/useProjectStore';
 import { useCharacterStore } from '@/stores/useCharacterStore';
 import { useHydration } from '@/hooks/useHydration';
@@ -31,21 +32,11 @@ export default function CharactersPage() {
   const [deleteTarget, setDeleteTarget] = useState<{ type: 'character' | 'group'; id: string } | null>(null);
   const [editTarget, setEditTarget] = useState<{ type: 'character' | 'group'; id: string; name: string; description?: string } | null>(null);
   const [moveTarget, setMoveTarget] = useState<{ id: string; name: string } | null>(null);
-  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
 
   const project = getProject(projectId);
   const allCharacters = getCharactersByProject(projectId);
   const groups = getGroupsByProject(projectId);
   const ungrouped = getUngroupedCharacters(projectId);
-
-  const toggleGroup = (groupId: string) => {
-    setCollapsedGroups((prev) => {
-      const next = new Set(prev);
-      if (next.has(groupId)) next.delete(groupId);
-      else next.add(groupId);
-      return next;
-    });
-  };
 
   const handleCreate = () => {
     const trimmed = newName.trim();
@@ -129,83 +120,88 @@ export default function CharactersPage() {
             <p className="text-text-muted text-sm">右上の＋ボタンでキャラクターを登録</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
-            {/* Groups */}
+          <div className="flex flex-col gap-3">
+            {/* Groups as navigable cards */}
             {groups.map((group) => {
               const groupChars = getCharactersByGroup(group.id);
-              const isCollapsed = collapsedGroups.has(group.id);
               return (
-                <div key={group.id} className="rounded-lg bg-bg-secondary overflow-hidden" style={{ boxShadow: 'var(--shadow-card)' }}>
-                  <div className="flex items-center gap-3 px-4 py-3">
-                    <button onClick={() => toggleGroup(group.id)} className="text-text-muted">
-                      {isCollapsed ? <ChevronRight size={18} /> : <ChevronDown size={18} />}
-                    </button>
+                <div
+                  key={group.id}
+                  className="group relative rounded-lg bg-bg-secondary p-4 transition-all hover:bg-bg-tertiary active:scale-[0.98]"
+                  style={{ boxShadow: 'var(--shadow-card)' }}
+                >
+                  <Link
+                    href={`/projects/${projectId}/characters/group/${group.id}`}
+                    className="flex items-center gap-4"
+                  >
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-accent-muted">
+                      <Folder size={24} className="text-accent" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-text-primary truncate">{group.name}</p>
+                      <p className="text-sm text-text-muted mt-0.5">{groupChars.length}人</p>
+                    </div>
+                    <ChevronRight size={18} className="text-text-muted" />
+                  </Link>
+                  <div className="absolute right-12 top-1/2 -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
-                      onClick={() => setEditTarget({ type: 'group', id: group.id, name: group.name })}
-                      className="flex-1 text-left"
+                      onClick={(e) => { e.stopPropagation(); setEditTarget({ type: 'group', id: group.id, name: group.name }); }}
+                      className="flex h-8 px-2 items-center justify-center rounded-full hover:bg-bg-elevated transition-colors text-xs text-text-muted"
                     >
-                      <span className="font-semibold text-accent text-sm">{group.name}</span>
-                      <span className="text-text-muted text-xs ml-2">({groupChars.length})</span>
+                      編集
                     </button>
                     <button
-                      onClick={() => { setTargetGroupId(group.id); setCreateMode('character'); }}
-                      className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-bg-tertiary transition-colors"
-                    >
-                      <Plus size={14} className="text-text-muted" />
-                    </button>
-                    <button
-                      onClick={() => setDeleteTarget({ type: 'group', id: group.id })}
-                      className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-red-600/20 transition-colors"
+                      onClick={(e) => { e.stopPropagation(); setDeleteTarget({ type: 'group', id: group.id }); }}
+                      className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-red-600/20 transition-colors"
                     >
                       <Trash2 size={14} className="text-text-muted hover:text-red-400" />
                     </button>
                   </div>
-                  {!isCollapsed && groupChars.length > 0 && (
-                    <div className="px-4 pb-3">
-                      <div className="flex flex-wrap gap-2">
-                        {groupChars.map((char) => (
-                          <CharacterChip
-                            key={char.id}
-                            name={char.name}
-                            description={char.description}
-                            onTap={() => setEditTarget({ type: 'character', id: char.id, name: char.name, description: char.description })}
-                            onDelete={() => setDeleteTarget({ type: 'character', id: char.id })}
-                            onMove={() => setMoveTarget({ id: char.id, name: char.name })}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {!isCollapsed && groupChars.length === 0 && (
-                    <p className="px-4 pb-3 text-text-muted text-xs">キャラクターなし</p>
-                  )}
                 </div>
               );
             })}
 
-            {/* Ungrouped */}
-            {ungrouped.length > 0 && (
-              <div className="rounded-lg bg-bg-secondary overflow-hidden" style={{ boxShadow: 'var(--shadow-card)' }}>
-                <div className="px-4 py-3">
-                  <span className="font-semibold text-text-secondary text-sm">未分類</span>
-                  <span className="text-text-muted text-xs ml-2">({ungrouped.length})</span>
-                </div>
-                <div className="px-4 pb-3">
-                  <div className="flex flex-wrap gap-2">
-                    {ungrouped.map((char) => (
-                      <CharacterChip
-                        key={char.id}
-                        name={char.name}
-                        description={char.description}
-                        onTap={() => setEditTarget({ type: 'character', id: char.id, name: char.name, description: char.description })}
-                        onDelete={() => setDeleteTarget({ type: 'character', id: char.id })}
-                        onMove={() => setMoveTarget({ id: char.id, name: char.name })}
-                      />
-                    ))}
+            {/* Ungrouped characters as individual cards */}
+            {ungrouped.map((char) => (
+              <div
+                key={char.id}
+                className="group relative rounded-lg bg-bg-secondary p-4 transition-all hover:bg-bg-tertiary"
+                style={{ boxShadow: 'var(--shadow-card)' }}
+              >
+                <button
+                  onClick={() => setEditTarget({ type: 'character', id: char.id, name: char.name, description: char.description })}
+                  className="w-full text-left flex items-center gap-4"
+                >
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-accent-muted">
+                    <Users size={24} className="text-accent" />
                   </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-text-primary truncate">{char.name}</p>
+                    {char.description ? (
+                      <p className="text-sm text-text-muted mt-0.5 truncate">{char.description}</p>
+                    ) : (
+                      <p className="text-sm text-text-muted mt-0.5">未分類</p>
+                    )}
+                  </div>
+                </button>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {groups.length > 0 && (
+                    <button
+                      onClick={() => setMoveTarget({ id: char.id, name: char.name })}
+                      className="flex h-8 px-2 items-center justify-center rounded-full hover:bg-bg-elevated transition-colors text-xs text-text-muted"
+                    >
+                      移動
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setDeleteTarget({ type: 'character', id: char.id })}
+                    className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-red-600/20 transition-colors"
+                  >
+                    <Trash2 size={14} className="text-text-muted hover:text-red-400" />
+                  </button>
                 </div>
               </div>
-            )}
+            ))}
           </div>
         )}
       </div>
@@ -374,58 +370,6 @@ export default function CharactersPage() {
       />
 
       <TabBar />
-    </div>
-  );
-}
-
-function CharacterChip({
-  name,
-  description,
-  onTap,
-  onDelete,
-  onMove,
-}: {
-  name: string;
-  description?: string;
-  onTap: () => void;
-  onDelete: () => void;
-  onMove: () => void;
-}) {
-  const [showActions, setShowActions] = useState(false);
-
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setShowActions(!showActions)}
-        className="rounded-lg bg-bg-tertiary px-4 py-2 text-left hover:bg-bg-elevated transition-colors"
-      >
-        <span className="text-sm font-medium text-text-primary">{name}</span>
-        {description && (
-          <p className="text-xs text-text-muted mt-0.5 line-clamp-1">{description}</p>
-        )}
-      </button>
-      {showActions && (
-        <div className="absolute top-full left-0 mt-1 z-10 flex gap-1 rounded-lg bg-bg-elevated p-1" style={{ boxShadow: 'var(--shadow-modal)' }}>
-          <button
-            onClick={() => { setShowActions(false); onTap(); }}
-            className="rounded-md px-3 py-1.5 text-xs text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors"
-          >
-            編集
-          </button>
-          <button
-            onClick={() => { setShowActions(false); onMove(); }}
-            className="rounded-md px-3 py-1.5 text-xs text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors"
-          >
-            移動
-          </button>
-          <button
-            onClick={() => { setShowActions(false); onDelete(); }}
-            className="rounded-md px-3 py-1.5 text-xs text-red-400 hover:bg-red-600/20 transition-colors"
-          >
-            削除
-          </button>
-        </div>
-      )}
     </div>
   );
 }
