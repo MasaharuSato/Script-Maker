@@ -7,12 +7,15 @@ import type { Script, ScriptBlock, NewBlock } from '@/types';
 
 interface ScriptState {
   scripts: Script[];
-  createScript: (projectId: string, title: string) => Script;
+  createScript: (projectId: string, title: string, folderId?: string | null) => Script;
   deleteScript: (id: string) => void;
   deleteScriptsByProject: (projectId: string) => void;
+  deleteScriptsByFolder: (folderId: string) => void;
   renameScript: (id: string, title: string) => void;
   getScript: (id: string) => Script | undefined;
   getScriptsByProject: (projectId: string) => Script[];
+  getScriptsByFolder: (folderId: string) => Script[];
+  getRootScripts: (projectId: string) => Script[];
   addBlock: (scriptId: string, block: NewBlock) => void;
   removeBlock: (scriptId: string, blockId: string) => void;
   updateBlock: (scriptId: string, blockId: string, updates: Record<string, string>) => void;
@@ -23,11 +26,12 @@ export const useScriptStore = create<ScriptState>()(
   persist(
     (set, get) => ({
       scripts: [],
-      createScript: (projectId, title) => {
+      createScript: (projectId, title, folderId = null) => {
         const script: Script = {
           id: nanoid(),
           title,
           projectId,
+          folderId: folderId ?? null,
           blocks: [],
           characters: [],
           createdAt: new Date().toISOString(),
@@ -40,6 +44,8 @@ export const useScriptStore = create<ScriptState>()(
         set((state) => ({ scripts: state.scripts.filter((s) => s.id !== id) })),
       deleteScriptsByProject: (projectId) =>
         set((state) => ({ scripts: state.scripts.filter((s) => s.projectId !== projectId) })),
+      deleteScriptsByFolder: (folderId) =>
+        set((state) => ({ scripts: state.scripts.filter((s) => s.folderId !== folderId) })),
       renameScript: (id, title) =>
         set((state) => ({
           scripts: state.scripts.map((s) =>
@@ -49,6 +55,10 @@ export const useScriptStore = create<ScriptState>()(
       getScript: (id) => get().scripts.find((s) => s.id === id),
       getScriptsByProject: (projectId) =>
         get().scripts.filter((s) => s.projectId === projectId),
+      getScriptsByFolder: (folderId) =>
+        get().scripts.filter((s) => s.folderId === folderId),
+      getRootScripts: (projectId) =>
+        get().scripts.filter((s) => s.projectId === projectId && s.folderId === null),
       addBlock: (scriptId, blockData) => {
         const block = {
           ...blockData,

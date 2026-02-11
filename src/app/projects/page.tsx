@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Plus, Clapperboard } from 'lucide-react';
 import { useProjectStore } from '@/stores/useProjectStore';
 import { useScriptStore } from '@/stores/useScriptStore';
+import { useFolderStore } from '@/stores/useFolderStore';
 import { useHydration } from '@/hooks/useHydration';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { ProjectCard } from '@/components/projects/ProjectCard';
@@ -14,11 +15,13 @@ export default function ProjectsPage() {
   const hydrated = useHydration();
   const { projects, createProject, deleteProject } = useProjectStore();
   const { scripts, deleteScriptsByProject } = useScriptStore();
+  const { deleteFoldersByProject } = useFolderStore();
   const [showCreate, setShowCreate] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   const handleDelete = (id: string) => {
     deleteScriptsByProject(id);
+    deleteFoldersByProject(id);
     deleteProject(id);
   };
 

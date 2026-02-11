@@ -20,7 +20,8 @@
       "Bash(NODE_OPTIONS=\"--require c:/Users/emper/projects/Script-Maker/_hostname-fix.js\" npx vercel login:*)",
       "Bash(NODE_OPTIONS=\"--require c:/Users/emper/projects/Script-Maker/_hostname-fix.js\" npx vercel:*)",
       "Bash(del \"c:\\\\Users\\\\emper\\\\projects\\\\Script-Maker\\\\_hostname-fix.js\")",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   }
 }

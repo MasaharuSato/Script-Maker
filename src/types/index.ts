@@ -33,8 +33,17 @@ export interface Script {
   id: string;
   title: string;
   projectId: string;
+  folderId: string | null;
   blocks: ScriptBlock[];
   characters: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Folder {
+  id: string;
+  name: string;
+  projectId: string;
   createdAt: string;
   updatedAt: string;
 }
