@@ -64,6 +64,7 @@ export function DialogueInput({
   const ungroupedProjectChars = projectCharacters?.filter((c) => c.groupId === null) ?? [];
   const projectCharNames = projectCharacters?.map((c) => c.name) ?? [];
   const localOnlyChars = characters.filter((c) => !projectCharNames.includes(c));
+  const selectedCharData = projectCharacters?.find((c) => c.name === character);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="セリフ">
@@ -195,6 +196,12 @@ export function DialogueInput({
             >
               OK
             </button>
+          </div>
+        )}
+
+        {selectedCharData?.description && (
+          <div className="mt-2 rounded-md bg-bg-tertiary/50 px-3 py-2">
+            <p className="text-xs text-text-muted">{selectedCharData.description}</p>
           </div>
         )}
       </div>

@@ -18,7 +18,7 @@ export default function CharactersPage() {
   const hydrated = useHydration();
   const { getProject } = useProjectStore();
   const {
-    addCharacter, deleteCharacter, renameCharacter, moveCharacter,
+    addCharacter, deleteCharacter, renameCharacter, updateDescription, moveCharacter,
     getCharactersByProject, getCharactersByGroup, getUngroupedCharacters,
     addGroup, deleteGroup, renameGroup, getGroupsByProject,
   } = useCharacterStore();
@@ -26,9 +26,10 @@ export default function CharactersPage() {
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [createMode, setCreateMode] = useState<CreateMode>(null);
   const [newName, setNewName] = useState('');
+  const [newDescription, setNewDescription] = useState('');
   const [targetGroupId, setTargetGroupId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ type: 'character' | 'group'; id: string } | null>(null);
-  const [editTarget, setEditTarget] = useState<{ type: 'character' | 'group'; id: string; name: string } | null>(null);
+  const [editTarget, setEditTarget] = useState<{ type: 'character' | 'group'; id: string; name: string; description?: string } | null>(null);
   const [moveTarget, setMoveTarget] = useState<{ id: string; name: string } | null>(null);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
 
@@ -50,21 +51,23 @@ export default function CharactersPage() {
     const trimmed = newName.trim();
     if (!trimmed) return;
     if (createMode === 'character') {
-      addCharacter(projectId, trimmed, targetGroupId);
+      addCharacter(projectId, trimmed, targetGroupId, newDescription.trim());
     } else if (createMode === 'group') {
       addGroup(projectId, trimmed);
     }
     setNewName('');
+    setNewDescription('');
     setCreateMode(null);
     setTargetGroupId(null);
   };
 
-  const handleRename = () => {
+  const handleEdit = () => {
     if (!editTarget) return;
     const trimmed = editTarget.name.trim();
     if (!trimmed) return;
     if (editTarget.type === 'character') {
       renameCharacter(editTarget.id, trimmed);
+      updateDescription(editTarget.id, editTarget.description?.trim() ?? '');
     } else {
       renameGroup(editTarget.id, trimmed);
     }
@@ -164,7 +167,8 @@ export default function CharactersPage() {
                           <CharacterChip
                             key={char.id}
                             name={char.name}
-                            onTap={() => setEditTarget({ type: 'character', id: char.id, name: char.name })}
+                            description={char.description}
+                            onTap={() => setEditTarget({ type: 'character', id: char.id, name: char.name, description: char.description })}
                             onDelete={() => setDeleteTarget({ type: 'character', id: char.id })}
                             onMove={() => setMoveTarget({ id: char.id, name: char.name })}
                           />
@@ -192,7 +196,8 @@ export default function CharactersPage() {
                       <CharacterChip
                         key={char.id}
                         name={char.name}
-                        onTap={() => setEditTarget({ type: 'character', id: char.id, name: char.name })}
+                        description={char.description}
+                        onTap={() => setEditTarget({ type: 'character', id: char.id, name: char.name, description: char.description })}
                         onDelete={() => setDeleteTarget({ type: 'character', id: char.id })}
                         onMove={() => setMoveTarget({ id: char.id, name: char.name })}
                       />
@@ -238,7 +243,7 @@ export default function CharactersPage() {
       {/* Create input */}
       <Modal
         isOpen={createMode !== null}
-        onClose={() => { setCreateMode(null); setNewName(''); setTargetGroupId(null); }}
+        onClose={() => { setCreateMode(null); setNewName(''); setNewDescription(''); setTargetGroupId(null); }}
         title={createMode === 'group' ? '新しいグループ' : '新しいキャラクター'}
       >
         {createMode === 'character' && groups.length > 0 && (
@@ -275,11 +280,20 @@ export default function CharactersPage() {
           type="text"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+          onKeyDown={(e) => e.key === 'Enter' && createMode === 'group' && handleCreate()}
           placeholder={createMode === 'group' ? 'グループ名...' : 'キャラクター名...'}
           autoFocus
           className="w-full rounded-lg bg-bg-tertiary px-4 py-3 text-text-primary placeholder:text-text-muted border border-border focus:border-accent transition-colors"
         />
+        {createMode === 'character' && (
+          <textarea
+            value={newDescription}
+            onChange={(e) => setNewDescription(e.target.value)}
+            placeholder="説明（任意）..."
+            rows={2}
+            className="mt-3 w-full rounded-lg bg-bg-tertiary px-4 py-3 text-sm text-text-primary placeholder:text-text-muted border border-border focus:border-accent transition-colors resize-none"
+          />
+        )}
         <button
           onClick={handleCreate}
           disabled={!newName.trim()}
@@ -289,26 +303,36 @@ export default function CharactersPage() {
         </button>
       </Modal>
 
-      {/* Rename input */}
+      {/* Edit modal */}
       <Modal
         isOpen={!!editTarget}
         onClose={() => setEditTarget(null)}
-        title={editTarget?.type === 'group' ? 'グループ名を変更' : 'キャラクター名を変更'}
+        title={editTarget?.type === 'group' ? 'グループを編集' : 'キャラクターを編集'}
       >
         <input
           type="text"
           value={editTarget?.name ?? ''}
           onChange={(e) => editTarget && setEditTarget({ ...editTarget, name: e.target.value })}
-          onKeyDown={(e) => e.key === 'Enter' && handleRename()}
+          onKeyDown={(e) => e.key === 'Enter' && editTarget?.type === 'group' && handleEdit()}
+          placeholder="名前"
           autoFocus
           className="w-full rounded-lg bg-bg-tertiary px-4 py-3 text-text-primary placeholder:text-text-muted border border-border focus:border-accent transition-colors"
         />
+        {editTarget?.type === 'character' && (
+          <textarea
+            value={editTarget.description ?? ''}
+            onChange={(e) => editTarget && setEditTarget({ ...editTarget, description: e.target.value })}
+            placeholder="説明（任意）..."
+            rows={2}
+            className="mt-3 w-full rounded-lg bg-bg-tertiary px-4 py-3 text-sm text-text-primary placeholder:text-text-muted border border-border focus:border-accent transition-colors resize-none"
+          />
+        )}
         <button
-          onClick={handleRename}
+          onClick={handleEdit}
           disabled={!editTarget?.name.trim()}
           className="mt-4 w-full rounded-full bg-accent py-3 font-semibold text-black hover:bg-accent-light disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
-          変更
+          保存
         </button>
       </Modal>
 
@@ -356,11 +380,13 @@ export default function CharactersPage() {
 
 function CharacterChip({
   name,
+  description,
   onTap,
   onDelete,
   onMove,
 }: {
   name: string;
+  description?: string;
   onTap: () => void;
   onDelete: () => void;
   onMove: () => void;
@@ -371,9 +397,12 @@ function CharacterChip({
     <div className="relative">
       <button
         onClick={() => setShowActions(!showActions)}
-        className="rounded-full bg-bg-tertiary px-4 py-2 text-sm font-medium text-text-primary hover:bg-bg-elevated transition-colors"
+        className="rounded-lg bg-bg-tertiary px-4 py-2 text-left hover:bg-bg-elevated transition-colors"
       >
-        {name}
+        <span className="text-sm font-medium text-text-primary">{name}</span>
+        {description && (
+          <p className="text-xs text-text-muted mt-0.5 line-clamp-1">{description}</p>
+        )}
       </button>
       {showActions && (
         <div className="absolute top-full left-0 mt-1 z-10 flex gap-1 rounded-lg bg-bg-elevated p-1" style={{ boxShadow: 'var(--shadow-modal)' }}>
@@ -381,7 +410,7 @@ function CharacterChip({
             onClick={() => { setShowActions(false); onTap(); }}
             className="rounded-md px-3 py-1.5 text-xs text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors"
           >
-            名前変更
+            編集
           </button>
           <button
             onClick={() => { setShowActions(false); onMove(); }}
