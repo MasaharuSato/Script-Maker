@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useScriptStore } from '@/stores/useScriptStore';
+import { useCharacterStore } from '@/stores/useCharacterStore';
 import { useHydration } from '@/hooks/useHydration';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { ScriptDisplay } from '@/components/editor/ScriptDisplay';
@@ -14,10 +15,13 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import type { ActiveInput, ScriptBlock } from '@/types';
 
 export default function EditorPage() {
-  const { scriptId } = useParams<{ projectId: string; scriptId: string }>();
+  const { projectId, scriptId } = useParams<{ projectId: string; scriptId: string }>();
   const hydrated = useHydration();
   const { scripts, addBlock, removeBlock, updateBlock, addCharacter } = useScriptStore();
+  const { getCharactersByProject, getGroupsByProject } = useCharacterStore();
   const script = scripts.find((s) => s.id === scriptId);
+  const projectCharacters = getCharactersByProject(projectId);
+  const characterGroups = getGroupsByProject(projectId);
 
   const [activeInput, setActiveInput] = useState<ActiveInput>(null);
   const [editingBlock, setEditingBlock] = useState<ScriptBlock | null>(null);
@@ -125,6 +129,8 @@ export default function EditorPage() {
         onSubmit={handleAddDialogue}
         characters={script.characters}
         onAddCharacter={(name) => addCharacter(scriptId, name)}
+        projectCharacters={projectCharacters}
+        characterGroups={characterGroups}
       />
       <DialogueInput
         isOpen={activeInput === 'dialogue' && !!editingBlock}
@@ -134,6 +140,8 @@ export default function EditorPage() {
         onAddCharacter={(name) => addCharacter(scriptId, name)}
         initialCharacter={editingBlock?.type === 'dialogue' ? editingBlock.character : ''}
         initialText={editingBlock?.type === 'dialogue' ? editingBlock.text : ''}
+        projectCharacters={projectCharacters}
+        characterGroups={characterGroups}
       />
 
       <ActionInput

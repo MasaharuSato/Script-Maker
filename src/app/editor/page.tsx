@@ -5,6 +5,7 @@ import { Save } from 'lucide-react';
 import { useProjectStore } from '@/stores/useProjectStore';
 import { useScriptStore } from '@/stores/useScriptStore';
 import { useFolderStore } from '@/stores/useFolderStore';
+import { useCharacterStore } from '@/stores/useCharacterStore';
 import { useHydration } from '@/hooks/useHydration';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { TabBar } from '@/components/layout/TabBar';
@@ -23,10 +24,12 @@ export default function QuickEditorPage() {
   const { projects } = useProjectStore();
   const { createScript, addBlock: storeAddBlock } = useScriptStore();
   const { folders } = useFolderStore();
+  const { getCharactersByProject, getGroupsByProject } = useCharacterStore();
 
   const [title, setTitle] = useState('');
   const [blocks, setBlocks] = useState<ScriptBlock[]>([]);
   const [characters, setCharacters] = useState<string[]>([]);
+  const [charProjectId, setCharProjectId] = useState<string | null>(null);
   const [activeInput, setActiveInput] = useState<ActiveInput>(null);
   const [editingBlock, setEditingBlock] = useState<ScriptBlock | null>(null);
   const [deleteBlockId, setDeleteBlockId] = useState<string | null>(null);
@@ -171,6 +174,38 @@ export default function QuickEditorPage() {
         />
       </div>
 
+      {/* Character source project selector */}
+      {projects.length > 0 && (
+        <div className="px-4 pb-2">
+          <div className="flex items-center gap-2 overflow-x-auto">
+            <span className="text-xs text-text-muted whitespace-nowrap">キャラ参照:</span>
+            <button
+              onClick={() => setCharProjectId(null)}
+              className={`rounded-full px-3 py-1 text-xs whitespace-nowrap transition-colors ${
+                charProjectId === null
+                  ? 'bg-bg-tertiary text-text-secondary'
+                  : 'text-text-muted hover:text-text-secondary'
+              }`}
+            >
+              なし
+            </button>
+            {projects.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => setCharProjectId(p.id)}
+                className={`rounded-full px-3 py-1 text-xs whitespace-nowrap transition-colors ${
+                  charProjectId === p.id
+                    ? 'bg-accent/20 text-accent border border-accent'
+                    : 'bg-bg-tertiary text-text-secondary hover:text-text-primary border border-transparent'
+                }`}
+              >
+                {p.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {saved && (
         <div className="mx-4 mb-2 rounded-lg bg-accent/20 px-4 py-2 text-center text-sm font-medium text-accent">
           保存しました
@@ -205,6 +240,8 @@ export default function QuickEditorPage() {
         onSubmit={handleAddDialogue}
         characters={characters}
         onAddCharacter={(name) => setCharacters((prev) => [...prev, name])}
+        projectCharacters={charProjectId ? getCharactersByProject(charProjectId) : undefined}
+        characterGroups={charProjectId ? getGroupsByProject(charProjectId) : undefined}
       />
       <DialogueInput
         isOpen={activeInput === 'dialogue' && !!editingBlock}
@@ -214,6 +251,8 @@ export default function QuickEditorPage() {
         onAddCharacter={(name) => setCharacters((prev) => [...prev, name])}
         initialCharacter={editingBlock?.type === 'dialogue' ? editingBlock.character : ''}
         initialText={editingBlock?.type === 'dialogue' ? editingBlock.text : ''}
+        projectCharacters={charProjectId ? getCharactersByProject(charProjectId) : undefined}
+        characterGroups={charProjectId ? getGroupsByProject(charProjectId) : undefined}
       />
 
       <ActionInput

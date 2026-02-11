@@ -5,6 +5,7 @@ import { Plus, Clapperboard } from 'lucide-react';
 import { useProjectStore } from '@/stores/useProjectStore';
 import { useScriptStore } from '@/stores/useScriptStore';
 import { useFolderStore } from '@/stores/useFolderStore';
+import { useCharacterStore } from '@/stores/useCharacterStore';
 import { useHydration } from '@/hooks/useHydration';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { TabBar } from '@/components/layout/TabBar';
@@ -17,12 +18,15 @@ export default function ProjectsPage() {
   const { projects, createProject, deleteProject } = useProjectStore();
   const { scripts, deleteScriptsByProject } = useScriptStore();
   const { deleteFoldersByProject } = useFolderStore();
+  const { deleteCharactersByProject, deleteGroupsByProject } = useCharacterStore();
   const [showCreate, setShowCreate] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   const handleDelete = (id: string) => {
     deleteScriptsByProject(id);
     deleteFoldersByProject(id);
+    deleteCharactersByProject(id);
+    deleteGroupsByProject(id);
     deleteProject(id);
   };
 

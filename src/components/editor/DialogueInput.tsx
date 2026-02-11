@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { Plus } from 'lucide-react';
+import type { Character, CharacterGroup } from '@/types';
 
 interface DialogueInputProps {
   isOpen: boolean;
@@ -12,6 +13,8 @@ interface DialogueInputProps {
   onAddCharacter: (name: string) => void;
   initialCharacter?: string;
   initialText?: string;
+  projectCharacters?: Character[];
+  characterGroups?: CharacterGroup[];
 }
 
 export function DialogueInput({
@@ -22,6 +25,8 @@ export function DialogueInput({
   onAddCharacter,
   initialCharacter = '',
   initialText = '',
+  projectCharacters,
+  characterGroups,
 }: DialogueInputProps) {
   const [character, setCharacter] = useState(initialCharacter);
   const [text, setText] = useState(initialText);
@@ -54,33 +59,123 @@ export function DialogueInput({
     onClose();
   };
 
+  const hasGroupedChars = projectCharacters && projectCharacters.length > 0;
+  const groups = characterGroups ?? [];
+  const ungroupedProjectChars = projectCharacters?.filter((c) => c.groupId === null) ?? [];
+  const projectCharNames = projectCharacters?.map((c) => c.name) ?? [];
+  const localOnlyChars = characters.filter((c) => !projectCharNames.includes(c));
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="セリフ">
       {/* Character selection */}
-      <div className="mb-4">
+      <div className="mb-4 max-h-[40vh] overflow-y-auto">
         <p className="text-text-muted text-sm mb-2">キャラクター</p>
-        <div className="flex flex-wrap gap-2">
-          {characters.map((c) => (
+
+        {hasGroupedChars ? (
+          <div className="flex flex-col gap-3">
+            {groups.map((group) => {
+              const groupChars = projectCharacters!.filter((c) => c.groupId === group.id);
+              if (groupChars.length === 0) return null;
+              return (
+                <div key={group.id}>
+                  <p className="text-xs font-medium text-accent mb-1.5">{group.name}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {groupChars.map((c) => (
+                      <button
+                        key={c.id}
+                        onClick={() => setCharacter(c.name)}
+                        className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                          character === c.name
+                            ? 'bg-accent text-black'
+                            : 'bg-bg-tertiary text-text-secondary hover:text-text-primary'
+                        }`}
+                      >
+                        {c.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+
+            {ungroupedProjectChars.length > 0 && (
+              <div>
+                {groups.length > 0 && (
+                  <p className="text-xs font-medium text-text-muted mb-1.5">未分類</p>
+                )}
+                <div className="flex flex-wrap gap-2">
+                  {ungroupedProjectChars.map((c) => (
+                    <button
+                      key={c.id}
+                      onClick={() => setCharacter(c.name)}
+                      className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                        character === c.name
+                          ? 'bg-accent text-black'
+                          : 'bg-bg-tertiary text-text-secondary hover:text-text-primary'
+                      }`}
+                    >
+                      {c.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {localOnlyChars.length > 0 && (
+              <div>
+                <p className="text-xs font-medium text-text-muted mb-1.5">この脚本のみ</p>
+                <div className="flex flex-wrap gap-2">
+                  {localOnlyChars.map((c) => (
+                    <button
+                      key={c}
+                      onClick={() => setCharacter(c)}
+                      className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                        character === c
+                          ? 'bg-accent text-black'
+                          : 'bg-bg-tertiary text-text-secondary hover:text-text-primary'
+                      }`}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setShowNewChar(true)}
+                className="flex items-center gap-1 rounded-full px-3 py-1.5 text-sm bg-bg-tertiary text-text-muted hover:text-accent transition-colors"
+              >
+                <Plus size={14} />
+                追加
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {characters.map((c) => (
+              <button
+                key={c}
+                onClick={() => setCharacter(c)}
+                className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                  character === c
+                    ? 'bg-accent text-black'
+                    : 'bg-bg-tertiary text-text-secondary hover:text-text-primary'
+                }`}
+              >
+                {c}
+              </button>
+            ))}
             <button
-              key={c}
-              onClick={() => setCharacter(c)}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                character === c
-                  ? 'bg-accent text-black'
-                  : 'bg-bg-tertiary text-text-secondary hover:text-text-primary'
-              }`}
+              onClick={() => setShowNewChar(true)}
+              className="flex items-center gap-1 rounded-full px-3 py-1.5 text-sm bg-bg-tertiary text-text-muted hover:text-accent transition-colors"
             >
-              {c}
+              <Plus size={14} />
+              追加
             </button>
-          ))}
-          <button
-            onClick={() => setShowNewChar(true)}
-            className="flex items-center gap-1 rounded-full px-3 py-1.5 text-sm bg-bg-tertiary text-text-muted hover:text-accent transition-colors"
-          >
-            <Plus size={14} />
-            追加
-          </button>
-        </div>
+          </div>
+        )}
 
         {showNewChar && (
           <div className="flex gap-2 mt-2">

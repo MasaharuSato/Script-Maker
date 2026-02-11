@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Plus, FileText, FolderPlus } from 'lucide-react';
+import Link from 'next/link';
+import { Plus, FileText, FolderPlus, Users } from 'lucide-react';
 import { useProjectStore } from '@/stores/useProjectStore';
 import { useScriptStore } from '@/stores/useScriptStore';
 import { useFolderStore } from '@/stores/useFolderStore';
@@ -81,6 +82,23 @@ export default function ProjectPage() {
           </button>
         }
       />
+
+      {/* Character management link */}
+      <div className="px-4 pt-3">
+        <Link
+          href={`/projects/${projectId}/characters`}
+          className="flex items-center gap-3 rounded-lg bg-bg-secondary p-3 hover:bg-bg-tertiary transition-colors"
+          style={{ boxShadow: 'var(--shadow-card)' }}
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-md bg-accent-muted">
+            <Users size={20} className="text-accent" />
+          </div>
+          <div className="flex-1">
+            <p className="font-medium text-text-primary text-sm">キャラクター管理</p>
+            <p className="text-xs text-text-muted">登場人物の登録・グループ分け</p>
+          </div>
+        </Link>
+      </div>
 
       <div className="flex-1 px-4 py-4">
         {isEmpty ? (

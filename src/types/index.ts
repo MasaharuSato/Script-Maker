@@ -57,6 +57,22 @@ export interface Project {
 
 export type ActiveInput = 'scene_heading' | 'dialogue' | 'action' | null;
 
+// キャラクター
+export interface CharacterGroup {
+  id: string;
+  name: string;
+  projectId: string;
+  createdAt: string;
+}
+
+export interface Character {
+  id: string;
+  name: string;
+  projectId: string;
+  groupId: string | null;
+  createdAt: string;
+}
+
 // メモ帳
 export interface Note {
   id: string;
