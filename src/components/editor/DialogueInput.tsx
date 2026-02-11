@@ -44,6 +44,7 @@ export function DialogueInput({
   const [text, setText] = useState(initialText);
   const [showNewChar, setShowNewChar] = useState(false);
   const [newCharName, setNewCharName] = useState('');
+  const [newCharAlias, setNewCharAlias] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -51,15 +52,19 @@ export function DialogueInput({
       setText(initialText);
       setShowNewChar(false);
       setNewCharName('');
+      setNewCharAlias('');
     }
   }, [isOpen, initialCharacter, initialText]);
 
   const handleAddCharacter = () => {
     const trimmed = newCharName.trim();
     if (!trimmed) return;
-    onAddCharacter(trimmed);
-    setCharacter(trimmed);
+    const aliasTrimmed = newCharAlias.trim();
+    const displayName = aliasTrimmed || trimmed;
+    onAddCharacter(displayName);
+    setCharacter(displayName);
     setNewCharName('');
+    setNewCharAlias('');
     setShowNewChar(false);
   };
 
@@ -230,23 +235,33 @@ export function DialogueInput({
         )}
 
         {showNewChar && (
-          <div className="flex gap-2 mt-2">
+          <div className="mt-2 flex flex-col gap-2">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={newCharName}
+                onChange={(e) => setNewCharName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddCharacter()}
+                placeholder="名前..."
+                autoFocus
+                className="flex-1 rounded-lg bg-bg-tertiary px-3 py-2 text-sm text-text-primary placeholder:text-text-muted border border-border focus:border-accent transition-colors"
+              />
+              <button
+                onClick={handleAddCharacter}
+                disabled={!newCharName.trim()}
+                className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-black disabled:opacity-40"
+              >
+                OK
+              </button>
+            </div>
             <input
               type="text"
-              value={newCharName}
-              onChange={(e) => setNewCharName(e.target.value)}
+              value={newCharAlias}
+              onChange={(e) => setNewCharAlias(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAddCharacter()}
-              placeholder="キャラ名..."
-              autoFocus
-              className="flex-1 rounded-lg bg-bg-tertiary px-3 py-2 text-sm text-text-primary placeholder:text-text-muted border border-border focus:border-accent transition-colors"
+              placeholder="通称（任意）..."
+              className="rounded-lg bg-bg-tertiary px-3 py-2 text-sm text-text-primary placeholder:text-text-muted border border-border focus:border-accent transition-colors"
             />
-            <button
-              onClick={handleAddCharacter}
-              disabled={!newCharName.trim()}
-              className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-black disabled:opacity-40"
-            >
-              OK
-            </button>
           </div>
         )}
 
