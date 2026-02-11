@@ -10,7 +10,12 @@ const tabs = [
   { href: '/notes', label: 'メモ帳', icon: StickyNote },
 ] as const;
 
-export function TabBar() {
+interface TabBarProps {
+  /** Return false to block navigation (e.g. unsaved work). */
+  onBeforeNavigate?: (href: string) => boolean;
+}
+
+export function TabBar({ onBeforeNavigate }: TabBarProps = {}) {
   const pathname = usePathname();
 
   const getActive = () => {
@@ -33,6 +38,11 @@ export function TabBar() {
           <Link
             key={tab.href}
             href={tab.href}
+            onClick={(e) => {
+              if (!isActive && onBeforeNavigate && !onBeforeNavigate(tab.href)) {
+                e.preventDefault();
+              }
+            }}
             className={`flex flex-col items-center gap-0.5 px-4 py-2.5 transition-colors ${
               isActive ? 'text-accent' : 'text-text-muted hover:text-text-secondary'
             }`}

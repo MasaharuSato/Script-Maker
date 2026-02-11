@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Save } from 'lucide-react';
 import { useProjectStore } from '@/stores/useProjectStore';
 import { useScriptStore } from '@/stores/useScriptStore';
@@ -21,6 +22,7 @@ import { nanoid } from 'nanoid';
 
 export default function QuickEditorPage() {
   const hydrated = useHydration();
+  const router = useRouter();
   const { projects } = useProjectStore();
   const { createScript, addBlock: storeAddBlock } = useScriptStore();
   const { folders } = useFolderStore();
@@ -37,6 +39,22 @@ export default function QuickEditorPage() {
   const [saveProjectId, setSaveProjectId] = useState<string | null>(null);
   const [saveFolderId, setSaveFolderId] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+
+  const hasUnsavedWork = title.trim() !== '' || blocks.length > 0;
+
+  const handleBeforeNavigate = useCallback((href: string): boolean => {
+    if (!hasUnsavedWork) return true;
+    setPendingNavigation(href);
+    return false;
+  }, [hasUnsavedWork]);
+
+  const handleConfirmLeave = () => {
+    if (pendingNavigation) {
+      router.push(pendingNavigation);
+      setPendingNavigation(null);
+    }
+  };
 
   const addBlock = (blockData: NewBlock) => {
     const block = {
@@ -188,7 +206,7 @@ export default function QuickEditorPage() {
 
       <EditorToolbar onSelect={setActiveInput} />
 
-      <TabBar />
+      <TabBar onBeforeNavigate={handleBeforeNavigate} />
 
       <SceneHeadingInput
         isOpen={activeInput === 'scene_heading' && !editingBlock}
@@ -247,6 +265,14 @@ export default function QuickEditorPage() {
         onConfirm={handleDeleteBlock}
         title="ブロックを削除"
         message="このブロックを削除しますか？"
+      />
+
+      <ConfirmDialog
+        isOpen={!!pendingNavigation}
+        onClose={() => setPendingNavigation(null)}
+        onConfirm={handleConfirmLeave}
+        title="ページを離れますか？"
+        message="制作途中の内容が保存されていません。このまま移動すると内容が消えますが、よろしいですか？"
       />
 
       {/* Save destination modal */}
