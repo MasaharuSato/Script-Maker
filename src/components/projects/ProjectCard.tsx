@@ -1,34 +1,29 @@
 'use client';
 
 import Link from 'next/link';
-import { FileText, Trash2 } from 'lucide-react';
+import { FolderOpen, Trash2 } from 'lucide-react';
 
-interface ScriptCardProps {
+interface ProjectCardProps {
   id: string;
-  folderId: string;
-  title: string;
-  blockCount: number;
-  updatedAt: string;
+  name: string;
+  scriptCount: number;
   onDelete: () => void;
 }
 
-export function ScriptCard({ id, folderId, title, blockCount, updatedAt, onDelete }: ScriptCardProps) {
-  const date = new Date(updatedAt);
-  const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
-
+export function ProjectCard({ id, name, scriptCount, onDelete }: ProjectCardProps) {
   return (
     <div
       className="group relative rounded-lg bg-bg-secondary p-4 transition-all hover:bg-bg-tertiary active:scale-[0.98]"
       style={{ boxShadow: 'var(--shadow-card)' }}
     >
-      <Link href={`/folders/${folderId}/${id}`} className="flex items-center gap-4">
+      <Link href={`/projects/${id}`} className="flex items-center gap-4">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-accent-muted">
-          <FileText size={24} className="text-accent" />
+          <FolderOpen size={24} className="text-accent" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-text-primary truncate">{title}</p>
+          <p className="font-semibold text-text-primary truncate">{name}</p>
           <p className="text-sm text-text-muted mt-0.5">
-            {blockCount}ブロック・{dateStr}
+            {scriptCount}本の脚本
           </p>
         </div>
       </Link>

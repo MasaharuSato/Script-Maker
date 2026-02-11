@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import { Modal } from '@/components/ui/Modal';
 
-interface FolderCreateModalProps {
+interface ProjectCreateModalProps {
   isOpen: boolean;
   onClose: () => void;
   onCreate: (name: string) => void;
 }
 
-export function FolderCreateModal({ isOpen, onClose, onCreate }: FolderCreateModalProps) {
+export function ProjectCreateModal({ isOpen, onClose, onCreate }: ProjectCreateModalProps) {
   const [name, setName] = useState('');
 
   const handleSubmit = () => {
@@ -21,13 +21,13 @@ export function FolderCreateModal({ isOpen, onClose, onCreate }: FolderCreateMod
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="新しいフォルダ">
+    <Modal isOpen={isOpen} onClose={onClose} title="新しいプロジェクト">
       <input
         type="text"
         value={name}
         onChange={(e) => setName(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-        placeholder="フォルダ名を入力..."
+        placeholder="プロジェクト名を入力..."
         autoFocus
         className="w-full rounded-lg bg-bg-tertiary px-4 py-3 text-text-primary placeholder:text-text-muted border border-border focus:border-accent transition-colors"
       />

@@ -14,7 +14,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import type { ActiveInput, ScriptBlock } from '@/types';
 
 export default function EditorPage() {
-  const { scriptId } = useParams<{ folderId: string; scriptId: string }>();
+  const { scriptId } = useParams<{ projectId: string; scriptId: string }>();
   const hydrated = useHydration();
   const { scripts, addBlock, removeBlock, updateBlock, addCharacter } = useScriptStore();
   const script = scripts.find((s) => s.id === scriptId);
@@ -107,7 +107,6 @@ export default function EditorPage() {
 
       <EditorToolbar onSelect={setActiveInput} />
 
-      {/* Scene Heading Input */}
       <SceneHeadingInput
         isOpen={activeInput === 'scene_heading' && !editingBlock}
         onClose={handleCloseInput}
@@ -120,7 +119,6 @@ export default function EditorPage() {
         initialValue={editingBlock?.type === 'scene_heading' ? editingBlock.location : ''}
       />
 
-      {/* Dialogue Input */}
       <DialogueInput
         isOpen={activeInput === 'dialogue' && !editingBlock}
         onClose={handleCloseInput}
@@ -138,7 +136,6 @@ export default function EditorPage() {
         initialText={editingBlock?.type === 'dialogue' ? editingBlock.text : ''}
       />
 
-      {/* Action Input */}
       <ActionInput
         isOpen={activeInput === 'action' && !editingBlock}
         onClose={handleCloseInput}
@@ -151,7 +148,6 @@ export default function EditorPage() {
         initialValue={editingBlock?.type === 'action' ? editingBlock.text : ''}
       />
 
-      {/* Delete confirmation */}
       <ConfirmDialog
         isOpen={!!deleteBlockId}
         onClose={() => setDeleteBlockId(null)}

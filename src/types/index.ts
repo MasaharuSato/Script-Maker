@@ -32,14 +32,14 @@ export type NewBlock = NewSceneHeadingBlock | NewDialogueBlock | NewActionBlock;
 export interface Script {
   id: string;
   title: string;
-  folderId: string;
+  projectId: string;
   blocks: ScriptBlock[];
   characters: string[];
   createdAt: string;
   updatedAt: string;
 }
 
-export interface Folder {
+export interface Project {
   id: string;
   name: string;
   createdAt: string;

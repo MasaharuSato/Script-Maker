@@ -1,37 +1,34 @@
 'use client';
 
 import Link from 'next/link';
-import { Folder, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { FileText, Trash2 } from 'lucide-react';
 
-interface FolderCardProps {
+interface ScriptCardProps {
   id: string;
-  name: string;
-  scriptCount: number;
+  projectId: string;
+  title: string;
+  blockCount: number;
   updatedAt: string;
   onDelete: () => void;
 }
 
-export function FolderCard({ id, name, scriptCount, updatedAt, onDelete }: FolderCardProps) {
-  const [showDelete, setShowDelete] = useState(false);
+export function ScriptCard({ id, projectId, title, blockCount, updatedAt, onDelete }: ScriptCardProps) {
+  const date = new Date(updatedAt);
+  const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
 
   return (
     <div
       className="group relative rounded-lg bg-bg-secondary p-4 transition-all hover:bg-bg-tertiary active:scale-[0.98]"
       style={{ boxShadow: 'var(--shadow-card)' }}
-      onContextMenu={(e) => {
-        e.preventDefault();
-        setShowDelete(!showDelete);
-      }}
     >
-      <Link href={`/folders/${id}`} className="flex items-center gap-4">
+      <Link href={`/projects/${projectId}/${id}`} className="flex items-center gap-4">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-accent-muted">
-          <Folder size={24} className="text-accent" />
+          <FileText size={24} className="text-accent" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-text-primary truncate">{name}</p>
+          <p className="font-semibold text-text-primary truncate">{title}</p>
           <p className="text-sm text-text-muted mt-0.5">
-            {scriptCount}本の脚本
+            {blockCount}ブロック・{dateStr}
           </p>
         </div>
       </Link>

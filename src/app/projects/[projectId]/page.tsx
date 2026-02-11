@@ -3,30 +3,30 @@
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Plus, FileText } from 'lucide-react';
-import { useFolderStore } from '@/stores/useFolderStore';
+import { useProjectStore } from '@/stores/useProjectStore';
 import { useScriptStore } from '@/stores/useScriptStore';
 import { useHydration } from '@/hooks/useHydration';
 import { AppHeader } from '@/components/layout/AppHeader';
-import { ScriptCard } from '@/components/folders/ScriptCard';
+import { ScriptCard } from '@/components/projects/ScriptCard';
 import { Modal } from '@/components/ui/Modal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
-export default function FolderPage() {
-  const { folderId } = useParams<{ folderId: string }>();
+export default function ProjectPage() {
+  const { projectId } = useParams<{ projectId: string }>();
   const hydrated = useHydration();
-  const { getFolder } = useFolderStore();
+  const { getProject } = useProjectStore();
   const { scripts, createScript, deleteScript } = useScriptStore();
   const [showCreate, setShowCreate] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
-  const folder = getFolder(folderId);
-  const folderScripts = scripts.filter((s) => s.folderId === folderId);
+  const project = getProject(projectId);
+  const projectScripts = scripts.filter((s) => s.projectId === projectId);
 
   const handleCreate = () => {
     const trimmed = newTitle.trim();
     if (!trimmed) return;
-    createScript(folderId, trimmed);
+    createScript(projectId, trimmed);
     setNewTitle('');
     setShowCreate(false);
   };
@@ -45,7 +45,7 @@ export default function FolderPage() {
   return (
     <div className="flex flex-col min-h-dvh">
       <AppHeader
-        title={folder?.name ?? 'フォルダ'}
+        title={project?.name ?? 'プロジェクト'}
         showBack
         rightAction={
           <button
@@ -59,7 +59,7 @@ export default function FolderPage() {
       />
 
       <div className="flex-1 px-4 py-4">
-        {folderScripts.length === 0 ? (
+        {projectScripts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-accent-muted mb-5">
               <FileText size={40} className="text-accent" />
@@ -69,11 +69,11 @@ export default function FolderPage() {
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            {folderScripts.map((script) => (
+            {projectScripts.map((script) => (
               <ScriptCard
                 key={script.id}
                 id={script.id}
-                folderId={folderId}
+                projectId={projectId}
                 title={script.title}
                 blockCount={script.blocks.length}
                 updatedAt={script.updatedAt}

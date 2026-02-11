@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(node --version:*)",
+      "Bash(npm --version:*)",
+      "Bash(npx create-next-app:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(gh auth:*)",
+      "Bash(where:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: スマホ向け脚本作成ツール初期実装\n\nフォルダ管理、脚本エディタ（柱・セリフ・ト書き）、\nSpotify風ダークテーマUI、localStorage永続化を実装\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(vercel:*)",
+      "Bash(npm i:*)",
+      "Bash(set:*)",
+      "Bash(powershell -Command \"[System.Environment]::SetEnvironmentVariable\\(''COMPUTERNAME'', ''ScriptMakerPC'', ''Process''\\); vercel login\")",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"[System.Environment]::SetEnvironmentVariable\\(''COMPUTERNAME'', ''ScriptMakerPC'', ''Process''\\); & ''C:\\\\Users\\\\emper\\\\AppData\\\\Roaming\\\\npm\\\\vercel.cmd'' login\")",
+      "Bash(node -e \"const os = require\\(''os''\\); const origHostname = os.hostname; os.hostname = \\(\\) => ''ScriptMakerPC''; require\\(''child_process''\\).execSync\\(''vercel login'', {stdio: ''inherit'', env: process.env}\\);\")",
+      "Bash(NODE_OPTIONS=\"--require c:/Users/emper/projects/Script-Maker/_hostname-fix.js\" npx vercel login:*)",
+      "Bash(NODE_OPTIONS=\"--require c:/Users/emper/projects/Script-Maker/_hostname-fix.js\" npx vercel:*)",
+      "Bash(del \"c:\\\\Users\\\\emper\\\\projects\\\\Script-Maker\\\\_hostname-fix.js\")",
+      "Bash(git commit:*)"
+    ]
+  }
+}
