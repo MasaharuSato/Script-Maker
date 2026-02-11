@@ -5,6 +5,11 @@ import { Modal } from '@/components/ui/Modal';
 import { Plus } from 'lucide-react';
 import type { Character, CharacterGroup } from '@/types';
 
+interface ProjectOption {
+  id: string;
+  name: string;
+}
+
 interface DialogueInputProps {
   isOpen: boolean;
   onClose: () => void;
@@ -15,6 +20,10 @@ interface DialogueInputProps {
   initialText?: string;
   projectCharacters?: Character[];
   characterGroups?: CharacterGroup[];
+  // For project selector inside the modal (quick editor only)
+  availableProjects?: ProjectOption[];
+  selectedProjectId?: string | null;
+  onProjectChange?: (projectId: string | null) => void;
 }
 
 export function DialogueInput({
@@ -27,6 +36,9 @@ export function DialogueInput({
   initialText = '',
   projectCharacters,
   characterGroups,
+  availableProjects,
+  selectedProjectId,
+  onProjectChange,
 }: DialogueInputProps) {
   const [character, setCharacter] = useState(initialCharacter);
   const [text, setText] = useState(initialText);
@@ -71,6 +83,38 @@ export function DialogueInput({
       {/* Character selection */}
       <div className="mb-4 max-h-[40vh] overflow-y-auto">
         <p className="text-text-muted text-sm mb-2">キャラクター</p>
+
+        {/* Project selector (quick editor only) */}
+        {availableProjects && availableProjects.length > 0 && onProjectChange && (
+          <div className="mb-3">
+            <p className="text-xs text-text-muted mb-1.5">キャラ参照</p>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                onClick={() => onProjectChange(null)}
+                className={`rounded-full px-3 py-1 text-xs transition-colors ${
+                  selectedProjectId === null || selectedProjectId === undefined
+                    ? 'bg-bg-tertiary text-text-secondary'
+                    : 'text-text-muted hover:text-text-secondary'
+                }`}
+              >
+                なし
+              </button>
+              {availableProjects.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => onProjectChange(p.id)}
+                  className={`rounded-full px-3 py-1 text-xs transition-colors ${
+                    selectedProjectId === p.id
+                      ? 'bg-accent/20 text-accent border border-accent'
+                      : 'bg-bg-tertiary text-text-secondary hover:text-text-primary border border-transparent'
+                  }`}
+                >
+                  {p.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {hasGroupedChars ? (
           <div className="flex flex-col gap-3">
