@@ -18,15 +18,16 @@ export default function CharacterGroupPage() {
   const hydrated = useHydration();
   const { getProject } = useProjectStore();
   const {
-    addCharacter, deleteCharacter, renameCharacter, updateDescription, moveCharacter,
+    addCharacter, deleteCharacter, renameCharacter, updateAlias, updateDescription, moveCharacter,
     getCharactersByGroup, getGroupsByProject,
     groups,
   } = useCharacterStore();
 
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
+  const [newAlias, setNewAlias] = useState('');
   const [newDescription, setNewDescription] = useState('');
-  const [editTarget, setEditTarget] = useState<{ id: string; name: string; description: string } | null>(null);
+  const [editTarget, setEditTarget] = useState<{ id: string; name: string; alias: string; description: string } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [moveTarget, setMoveTarget] = useState<{ id: string; name: string } | null>(null);
 
@@ -38,8 +39,9 @@ export default function CharacterGroupPage() {
   const handleCreate = () => {
     const trimmed = newName.trim();
     if (!trimmed) return;
-    addCharacter(projectId, trimmed, groupId, newDescription.trim());
+    addCharacter(projectId, trimmed, groupId, newDescription.trim(), newAlias.trim());
     setNewName('');
+    setNewAlias('');
     setNewDescription('');
     setShowCreate(false);
   };
@@ -49,6 +51,7 @@ export default function CharacterGroupPage() {
     const trimmed = editTarget.name.trim();
     if (!trimmed) return;
     renameCharacter(editTarget.id, trimmed);
+    updateAlias(editTarget.id, editTarget.alias.trim());
     updateDescription(editTarget.id, editTarget.description.trim());
     setEditTarget(null);
   };
@@ -103,8 +106,9 @@ export default function CharacterGroupPage() {
                 key={char.id}
                 id={char.id}
                 name={char.name}
+                alias={char.alias}
                 description={char.description}
-                onEdit={() => setEditTarget({ id: char.id, name: char.name, description: char.description ?? '' })}
+                onEdit={() => setEditTarget({ id: char.id, name: char.name, alias: char.alias ?? '', description: char.description ?? '' })}
                 onDelete={() => setDeleteTarget(char.id)}
                 onMove={() => setMoveTarget({ id: char.id, name: char.name })}
               />
@@ -116,16 +120,23 @@ export default function CharacterGroupPage() {
       {/* Create character */}
       <Modal
         isOpen={showCreate}
-        onClose={() => { setShowCreate(false); setNewName(''); setNewDescription(''); }}
+        onClose={() => { setShowCreate(false); setNewName(''); setNewAlias(''); setNewDescription(''); }}
         title="新しいキャラクター"
       >
         <input
           type="text"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
-          placeholder="キャラクター名..."
+          placeholder="名前..."
           autoFocus
           className="w-full rounded-lg bg-bg-tertiary px-4 py-3 text-text-primary placeholder:text-text-muted border border-border focus:border-accent transition-colors"
+        />
+        <input
+          type="text"
+          value={newAlias}
+          onChange={(e) => setNewAlias(e.target.value)}
+          placeholder="通称（任意）..."
+          className="mt-3 w-full rounded-lg bg-bg-tertiary px-4 py-3 text-text-primary placeholder:text-text-muted border border-border focus:border-accent transition-colors"
         />
         <textarea
           value={newDescription}
@@ -156,6 +167,13 @@ export default function CharacterGroupPage() {
           placeholder="名前"
           autoFocus
           className="w-full rounded-lg bg-bg-tertiary px-4 py-3 text-text-primary placeholder:text-text-muted border border-border focus:border-accent transition-colors"
+        />
+        <input
+          type="text"
+          value={editTarget?.alias ?? ''}
+          onChange={(e) => editTarget && setEditTarget({ ...editTarget, alias: e.target.value })}
+          placeholder="通称（任意）..."
+          className="mt-3 w-full rounded-lg bg-bg-tertiary px-4 py-3 text-text-primary placeholder:text-text-muted border border-border focus:border-accent transition-colors"
         />
         <textarea
           value={editTarget?.description ?? ''}

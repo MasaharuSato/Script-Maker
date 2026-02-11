@@ -74,9 +74,10 @@ export function DialogueInput({
   const hasGroupedChars = projectCharacters && projectCharacters.length > 0;
   const groups = characterGroups ?? [];
   const ungroupedProjectChars = projectCharacters?.filter((c) => c.groupId === null) ?? [];
-  const projectCharNames = projectCharacters?.map((c) => c.name) ?? [];
-  const localOnlyChars = characters.filter((c) => !projectCharNames.includes(c));
-  const selectedCharData = projectCharacters?.find((c) => c.name === character);
+  const projectCharDisplayNames = projectCharacters?.map((c) => c.alias || c.name) ?? [];
+  const localOnlyChars = characters.filter((c) => !projectCharDisplayNames.includes(c));
+  const selectedCharData = projectCharacters?.find((c) => (c.alias || c.name) === character);
+  const getDisplayName = (c: Character) => c.alias || c.name;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="セリフ">
@@ -125,19 +126,22 @@ export function DialogueInput({
                 <div key={group.id}>
                   <p className="text-xs font-medium text-accent mb-1.5">{group.name}</p>
                   <div className="flex flex-wrap gap-2">
-                    {groupChars.map((c) => (
-                      <button
-                        key={c.id}
-                        onClick={() => setCharacter(c.name)}
-                        className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                          character === c.name
-                            ? 'bg-accent text-black'
-                            : 'bg-bg-tertiary text-text-secondary hover:text-text-primary'
-                        }`}
-                      >
-                        {c.name}
-                      </button>
-                    ))}
+                    {groupChars.map((c) => {
+                      const display = getDisplayName(c);
+                      return (
+                        <button
+                          key={c.id}
+                          onClick={() => setCharacter(display)}
+                          className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                            character === display
+                              ? 'bg-accent text-black'
+                              : 'bg-bg-tertiary text-text-secondary hover:text-text-primary'
+                          }`}
+                        >
+                          {display}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               );
@@ -149,19 +153,22 @@ export function DialogueInput({
                   <p className="text-xs font-medium text-text-muted mb-1.5">未分類</p>
                 )}
                 <div className="flex flex-wrap gap-2">
-                  {ungroupedProjectChars.map((c) => (
-                    <button
-                      key={c.id}
-                      onClick={() => setCharacter(c.name)}
-                      className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                        character === c.name
-                          ? 'bg-accent text-black'
-                          : 'bg-bg-tertiary text-text-secondary hover:text-text-primary'
-                      }`}
-                    >
-                      {c.name}
-                    </button>
-                  ))}
+                  {ungroupedProjectChars.map((c) => {
+                    const display = getDisplayName(c);
+                    return (
+                      <button
+                        key={c.id}
+                        onClick={() => setCharacter(display)}
+                        className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                          character === display
+                            ? 'bg-accent text-black'
+                            : 'bg-bg-tertiary text-text-secondary hover:text-text-primary'
+                        }`}
+                      >
+                        {display}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -243,9 +250,14 @@ export function DialogueInput({
           </div>
         )}
 
-        {selectedCharData?.description && (
+        {selectedCharData && (selectedCharData.description || (selectedCharData.alias && selectedCharData.name !== selectedCharData.alias)) && (
           <div className="mt-2 rounded-md bg-bg-tertiary/50 px-3 py-2">
-            <p className="text-xs text-text-muted">{selectedCharData.description}</p>
+            {selectedCharData.alias && (
+              <p className="text-xs text-text-secondary mb-0.5">{selectedCharData.name}</p>
+            )}
+            {selectedCharData.description && (
+              <p className="text-xs text-text-muted">{selectedCharData.description}</p>
+            )}
           </div>
         )}
       </div>
