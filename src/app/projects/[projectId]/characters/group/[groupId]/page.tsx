@@ -10,6 +10,7 @@ import { AppHeader } from '@/components/layout/AppHeader';
 import { TabBar } from '@/components/layout/TabBar';
 import { Modal } from '@/components/ui/Modal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { AnimatedList } from '@/components/ui/AnimatedList';
 
 export default function CharacterGroupPage() {
   const { projectId, groupId } = useParams<{ projectId: string; groupId: string }>();
@@ -95,7 +96,7 @@ export default function CharacterGroupPage() {
             <p className="text-text-muted text-sm">右上の＋ボタンで追加</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <AnimatedList>
             {groupChars.map((char) => (
               <div
                 key={char.id}
@@ -127,7 +128,7 @@ export default function CharacterGroupPage() {
                 </div>
               </div>
             ))}
-          </div>
+          </AnimatedList>
         )}
       </div>
 

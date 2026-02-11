@@ -12,6 +12,7 @@ import { TabBar } from '@/components/layout/TabBar';
 import { ProjectCard } from '@/components/projects/ProjectCard';
 import { ProjectCreateModal } from '@/components/projects/ProjectCreateModal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { AnimatedList } from '@/components/ui/AnimatedList';
 
 export default function ProjectsPage() {
   const hydrated = useHydration();
@@ -66,7 +67,7 @@ export default function ProjectsPage() {
             <p className="text-text-muted text-sm">右上の＋ボタンでプロジェクトを作成</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <AnimatedList>
             {projects.map((project) => (
               <ProjectCard
                 key={project.id}
@@ -76,7 +77,7 @@ export default function ProjectsPage() {
                 onDelete={() => setDeleteTarget(project.id)}
               />
             ))}
-          </div>
+          </AnimatedList>
         )}
       </div>
 

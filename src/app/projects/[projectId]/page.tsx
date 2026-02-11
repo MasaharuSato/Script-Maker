@@ -14,6 +14,7 @@ import { ScriptCard } from '@/components/projects/ScriptCard';
 import { FolderCard } from '@/components/projects/FolderCard';
 import { Modal } from '@/components/ui/Modal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { AnimatedList } from '@/components/ui/AnimatedList';
 
 type CreateMode = 'script' | 'folder' | null;
 
@@ -110,7 +111,7 @@ export default function ProjectPage() {
             <p className="text-text-muted text-sm">右上の＋ボタンでフォルダや脚本を作成</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <AnimatedList>
             {/* Folders first */}
             {projectFolders.map((folder) => (
               <FolderCard
@@ -134,7 +135,7 @@ export default function ProjectPage() {
                 onDelete={() => setDeleteTarget({ type: 'script', id: script.id })}
               />
             ))}
-          </div>
+          </AnimatedList>
         )}
       </div>
 

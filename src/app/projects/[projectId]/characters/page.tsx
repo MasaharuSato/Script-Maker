@@ -11,6 +11,7 @@ import { AppHeader } from '@/components/layout/AppHeader';
 import { TabBar } from '@/components/layout/TabBar';
 import { Modal } from '@/components/ui/Modal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { AnimatedList } from '@/components/ui/AnimatedList';
 
 type CreateMode = 'character' | 'group' | null;
 
@@ -120,7 +121,7 @@ export default function CharactersPage() {
             <p className="text-text-muted text-sm">右上の＋ボタンでキャラクターを登録</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <AnimatedList>
             {/* Groups as navigable cards */}
             {groups.map((group) => {
               const groupChars = getCharactersByGroup(group.id);
@@ -202,7 +203,7 @@ export default function CharactersPage() {
                 </div>
               </div>
             ))}
-          </div>
+          </AnimatedList>
         )}
       </div>
 

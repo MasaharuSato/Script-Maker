@@ -11,6 +11,7 @@ import { TabBar } from '@/components/layout/TabBar';
 import { ScriptCard } from '@/components/projects/ScriptCard';
 import { Modal } from '@/components/ui/Modal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { AnimatedList } from '@/components/ui/AnimatedList';
 
 export default function FolderPage() {
   const { projectId, folderId } = useParams<{ projectId: string; folderId: string }>();
@@ -69,7 +70,7 @@ export default function FolderPage() {
             <p className="text-text-muted text-sm">右上の＋ボタンで新しい脚本を作成</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <AnimatedList>
             {folderScripts.map((script) => (
               <ScriptCard
                 key={script.id}
@@ -81,7 +82,7 @@ export default function FolderPage() {
                 onDelete={() => setDeleteTarget(script.id)}
               />
             ))}
-          </div>
+          </AnimatedList>
         )}
       </div>
 

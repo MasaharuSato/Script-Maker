@@ -12,6 +12,7 @@ import { NoteCard } from '@/components/notes/NoteCard';
 import { NoteFolderCard } from '@/components/notes/NoteFolderCard';
 import { Modal } from '@/components/ui/Modal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { AnimatedList } from '@/components/ui/AnimatedList';
 
 type CreateMode = 'note' | 'folder' | null;
 
@@ -90,7 +91,7 @@ export default function NotesPage() {
             <p className="text-text-muted text-sm">右上の＋ボタンでメモを作成</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <AnimatedList>
             {folders.map((folder) => (
               <NoteFolderCard
                 key={folder.id}
@@ -110,7 +111,7 @@ export default function NotesPage() {
                 onDelete={() => setDeleteTarget({ type: 'note', id: note.id })}
               />
             ))}
-          </div>
+          </AnimatedList>
         )}
       </div>
 
