@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Save } from 'lucide-react';
+import { Save, Share2 } from 'lucide-react';
 import { useProjectStore } from '@/stores/useProjectStore';
 import { useScriptStore } from '@/stores/useScriptStore';
 import { useFolderStore } from '@/stores/useFolderStore';
@@ -17,6 +17,7 @@ import { DialogueInput } from '@/components/editor/DialogueInput';
 import { ActionInput } from '@/components/editor/ActionInput';
 import { Modal } from '@/components/ui/Modal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { ExportModal } from '@/components/editor/ExportModal';
 import type { ActiveInput, ScriptBlock, NewBlock } from '@/types';
 import { nanoid } from 'nanoid';
 
@@ -40,6 +41,7 @@ export default function QuickEditorPage() {
   const [saveFolderId, setSaveFolderId] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+  const [showExport, setShowExport] = useState(false);
 
   const hasUnsavedWork = title.trim() !== '' || blocks.length > 0;
 
@@ -169,14 +171,22 @@ export default function QuickEditorPage() {
         title="起稿"
         rightAction={
           blocks.length > 0 ? (
-            <button
-              onClick={() => setShowSave(true)}
-              className="flex h-9 items-center gap-1.5 px-3 rounded-full bg-accent hover:bg-accent-light transition-colors"
-              style={{ boxShadow: 'var(--shadow-button)' }}
-            >
-              <Save size={16} className="text-black" />
-              <span className="text-sm font-semibold text-black">保存</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowExport(true)}
+                className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-bg-tertiary transition-colors"
+              >
+                <Share2 size={18} className="text-text-secondary" />
+              </button>
+              <button
+                onClick={() => setShowSave(true)}
+                className="flex h-9 items-center gap-1.5 px-3 rounded-full bg-accent hover:bg-accent-light transition-colors"
+                style={{ boxShadow: 'var(--shadow-button)' }}
+              >
+                <Save size={16} className="text-black" />
+                <span className="text-sm font-semibold text-black">保存</span>
+              </button>
+            </div>
           ) : undefined
         }
       />
@@ -273,6 +283,13 @@ export default function QuickEditorPage() {
         onConfirm={handleConfirmLeave}
         title="ページを離れますか？"
         message="制作途中の内容が保存されていません。このまま移動すると内容が消えますが、よろしいですか？"
+      />
+
+      <ExportModal
+        isOpen={showExport}
+        onClose={() => setShowExport(false)}
+        blocks={blocks}
+        title={title.trim() || undefined}
       />
 
       {/* Save destination modal */}

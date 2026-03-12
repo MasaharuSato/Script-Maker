@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
+import { Share2 } from 'lucide-react';
 import { useScriptStore } from '@/stores/useScriptStore';
 import { useCharacterStore } from '@/stores/useCharacterStore';
 import { useHydration } from '@/hooks/useHydration';
@@ -11,6 +12,7 @@ import { EditorToolbar } from '@/components/editor/EditorToolbar';
 import { SceneHeadingInput } from '@/components/editor/SceneHeadingInput';
 import { DialogueInput } from '@/components/editor/DialogueInput';
 import { ActionInput } from '@/components/editor/ActionInput';
+import { ExportModal } from '@/components/editor/ExportModal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import type { ActiveInput, ScriptBlock } from '@/types';
 
@@ -26,6 +28,7 @@ export default function EditorPage() {
   const [activeInput, setActiveInput] = useState<ActiveInput>(null);
   const [editingBlock, setEditingBlock] = useState<ScriptBlock | null>(null);
   const [deleteBlockId, setDeleteBlockId] = useState<string | null>(null);
+  const [showExport, setShowExport] = useState(false);
 
   const handleAddSceneHeading = (location: string) => {
     addBlock(scriptId, { type: 'scene_heading', location });
@@ -101,7 +104,20 @@ export default function EditorPage() {
 
   return (
     <div className="flex flex-col h-dvh">
-      <AppHeader title={script.title} showBack />
+      <AppHeader
+        title={script.title}
+        showBack
+        rightAction={
+          script.blocks.length > 0 ? (
+            <button
+              onClick={() => setShowExport(true)}
+              className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-bg-tertiary transition-colors"
+            >
+              <Share2 size={18} className="text-text-secondary" />
+            </button>
+          ) : undefined
+        }
+      />
 
       <ScriptDisplay
         blocks={script.blocks}
@@ -154,6 +170,13 @@ export default function EditorPage() {
         onClose={handleCloseInput}
         onSubmit={handleUpdateAction}
         initialValue={editingBlock?.type === 'action' ? editingBlock.text : ''}
+      />
+
+      <ExportModal
+        isOpen={showExport}
+        onClose={() => setShowExport(false)}
+        blocks={script.blocks}
+        title={script.title}
       />
 
       <ConfirmDialog
